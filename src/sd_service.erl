@@ -130,7 +130,7 @@ handle_call({fetch_all, external_services}, _From, State) ->
     Reply=State#state.external_services,
     {reply,Reply, State};
 handle_call({fetch_all, all}, _From, State) ->
-    Reply=lists:append(State#state.local_services,State#state.external_services),
+    Reply=lists:usort(lists:append(State#state.local_services,State#state.external_services)),
     {reply,Reply, State};
 
 

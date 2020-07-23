@@ -45,11 +45,19 @@ add_1()->
     rpc:cast(?VM1,sd_service,add_service,["s1"]),
     rpc:cast(node(),sd_service,trade_services,[]),
     rpc:cast(?VM1,sd_service,trade_services,[]),
-    timer:sleep(1000),
+    timer:sleep(100),
     ?assertMatch([{"s1",sd_test@asus}],
 		 rpc:call(node(),sd_service,fetch_all,[local_services])),
-    ?assertMatch(ok,rpc:call(node(),sd_service,fetch_all,[external_services])),
-    ?assertMatch(ok,rpc:call(node(),sd_service,fetch_all,[all])),
-    ?assertMatch(ok,rpc:call(?VM1,sd_service,fetch_all,[all])),
+    ?assertMatch([{"s1",node1@asus},{"s1",sd_test@asus}],
+		 rpc:call(node(),sd_service,fetch_all,[external_services])),
+    ?assertMatch([{"s1",node1@asus},
+		  {"s1",sd_test@asus}],
+		 rpc:call(node(),sd_service,fetch_all,[all])),
+
+    ?assertMatch([{"s1",node1@asus}],
+		 rpc:call(?VM1,sd_service,fetch_all,[local_services])),
+    ?assertMatch([{"s1",node1@asus},
+		  {"s1",sd_test@asus}],rpc:call(?VM1,sd_service,fetch_all,[all])),
+
     ok.
     
