@@ -36,8 +36,8 @@ cases_test()->
     %% Start application tests
     
     
- %   ?debugMsg("log test "),
-  %  ?assertEqual(ok,oam_test:start()),
+    ?debugMsg("sd  test "),
+    ?assertEqual(ok,sd_test:start()),
 
 
     ?debugMsg("Start stop_test_system:start"),

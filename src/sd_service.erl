@@ -118,7 +118,7 @@ handle_call({ping},_From,State) ->
     {reply, Reply, State};
 
 handle_call({fetch_service, WantedServiceId}, _From, State) ->
-    AllServices=[State#state.local_services|State#state.external_services],
+    AllServices=lists:append(State#state.local_services,State#state.external_services),
     Reply=[Node||{ServiceId,Node}<-AllServices,
 		 WantedServiceId==ServiceId],
     {reply,Reply, State};
@@ -130,7 +130,7 @@ handle_call({fetch_all, external_services}, _From, State) ->
     Reply=State#state.external_services,
     {reply,Reply, State};
 handle_call({fetch_all, all}, _From, State) ->
-    Reply=[State#state.external_services|State#state.local_services],
+    Reply=lists:append(State#state.local_services,State#state.external_services),
     {reply,Reply, State};
 
 
@@ -177,7 +177,7 @@ handle_cast({trade_services,ReplyTo, ExternalServiceList},
         _ ->
             rpc:cast(ReplyTo,sd_service,trade_services,[noreply, LocalServiceList])
     end,
-    NewState=State#state{local_services=lists:usort(lists:append([ExternalServiceList|OldExternalServiceList]))},
+    NewState=State#state{external_services=lists:usort(lists:append(ExternalServiceList,OldExternalServiceList))},
     {noreply, NewState};
 			     
 
