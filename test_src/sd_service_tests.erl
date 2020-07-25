@@ -52,7 +52,10 @@ cases_test()->
 %% Returns: non
 %% --------------------------------------------------------------------
 setup()->
-    ?assertEqual({pong,node1@asus,sd_service},rpc:call('node1@asus',sd_service,ping,[])),
+    ?assertEqual(ok,rpc:call('node1@asus',application,start,[sd_service])),
+    %timer:sleep(200),	
+    
+   ?assertEqual({pong,node1@asus,sd_service},rpc:call('node1@asus',sd_service,ping,[])),
     ?assertEqual(ok,application:start(sd_service)),
 
     ok.

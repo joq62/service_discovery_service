@@ -16,5 +16,5 @@ test:
 	cp src/*app ebin;
 	erlc -I include -o ebin src/*.erl;
 	erlc -I include -o test_ebin test_src/*.erl;
-	erl -pa ebin -s sd_service start -sname node1 -detached
-	erl -pa ebin -pa */ebin -pa test_ebin -s sd_service_tests start -sname sd_test
+	erl -config test.config -pa ebin -sname node1 -detached
+	erl -config test.config -pa ebin -pa */ebin -pa test_ebin -s sd_service_tests start -sname sd_test

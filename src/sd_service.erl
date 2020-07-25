@@ -10,7 +10,7 @@
 %% --------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
--include("timeout.hrl").
+%-include("timeout.hrl").
 -include("log.hrl").
 %-include("config.hrl").
 %% --------------------------------------------------------------------
@@ -99,8 +99,10 @@ heart_beat(Interval)->
 %
 %% --------------------------------------------------------------------
 init([]) ->
-    spawn(fun()->h_beat(?VM_HEARTBEAT) end),
-       {ok, #state{local_services=[],
+    {ok,HbInterval}= application:get_env(hb_interval),
+    
+    spawn(fun()->h_beat(HbInterval) end),
+    {ok, #state{local_services=[],
                 external_services=[]}}.
     
 %% --------------------------------------------------------------------
