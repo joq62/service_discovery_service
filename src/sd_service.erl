@@ -120,7 +120,10 @@ handle_call({ping},_From,State) ->
 
 
 handle_call({add_service, ServiceId},_From,State) ->
-    NewState=State#state{local_services=lists:usort([{ServiceId,node()}|State#state.local_services])},
+    NewLocalServices=[{ServiceId,node()}|
+		       [{S,N}||{S,N}<-State#state.local_services,
+			     S/=ServiceId]],
+    NewState=State#state{local_services=NewLocalServices},
     sd_service:trade_services(),
     {reply,ok,NewState};
 
