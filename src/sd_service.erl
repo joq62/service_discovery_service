@@ -172,7 +172,7 @@ handle_cast({heart_beat,Interval}, State) ->
 handle_cast({trade_services}, State) ->
     LocalServicesList = State#state.local_services,
     LocalNode=node(),
-    AllNodes = [LocalNode | nodes()],
+    AllNodes = nodes(),
     [rpc:cast(Node,sd_service,trade_services,[LocalNode,LocalServicesList])||
 	Node<-AllNodes],
     {noreply, State};
@@ -186,10 +186,12 @@ handle_cast({trade_services,ReplyTo, ExternalServiceList},
         _ ->
             rpc:cast(ReplyTo,sd_service,trade_services,[noreply, LocalServiceList])
     end,
-    NewState=State#state{external_services=lists:usort(lists:append(ExternalServiceList,OldExternalServiceList))},
+    FilteredExternalService=[{ServiceId,Node}||{ServiceId,Node}<-ExternalServiceList,
+				false==lists:member({ServiceId,Node},OldExternalServiceList)],
+
+    NewState=State#state{external_services=lists:append(FilteredExternalService,OldExternalServiceList)},
     {noreply, NewState};
 			     
-
 handle_cast(Msg, State) ->
     io:format("unmatched match cast ~p~n",[{?MODULE,?LINE,Msg}]),
     {noreply, State}.
