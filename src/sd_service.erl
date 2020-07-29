@@ -69,14 +69,13 @@ fetch_service(ServiceId) ->
     gen_server:call(?MODULE, {fetch_service, ServiceId}).
 fetch_all(ServiceList) ->
     gen_server:call(?MODULE, {fetch_all, ServiceList}).
-
+add_service(ServiceId) ->
+    gen_server:call(?MODULE, {add_service, ServiceId}).
+remove_service(ServiceId) ->
+    gen_server:call(?MODULE, {remove_service,ServiceId}).
 
 %%----------------------------------------------------------------------
 
-add_service(ServiceId) ->
-    gen_server:cast(?MODULE, {add_service, ServiceId}).
-remove_service(ServiceId) ->
-    gen_server:cast(?MODULE, {remove_service,ServiceId}).
 trade_services() ->
     gen_server:cast(?MODULE, {trade_services}).
 trade_services(Node,ExportedServiceList) ->
@@ -119,6 +118,18 @@ handle_call({ping},_From,State) ->
     Reply={pong,node(),?MODULE},
     {reply, Reply, State};
 
+
+handle_call({add_service, ServiceId},_From,State) ->
+    NewState=State#state{local_services=lists:usort([{ServiceId,node()}|State#state.local_services])},
+    sd_service:trade_services(),
+    {reply,ok,NewState};
+
+handle_call({remove_service,ServiceId}, _From,State) ->
+    NewState=State#state{local_services=lists:delete({ServiceId,node()},State#state.local_services)},
+    sd_service:trade_services(),
+    
+    {reply,ok,NewState};
+
 handle_call({fetch_service, WantedServiceId}, _From, State) ->
     AllServices=lists:append(State#state.local_services,State#state.external_services),
     Reply=[Node||{ServiceId,Node}<-AllServices,
@@ -154,15 +165,6 @@ handle_cast({heart_beat,Interval}, State) ->
     spawn(fun()->h_beat(Interval) end),    
     {noreply, State};
 
-handle_cast({add_service, ServiceId}, State) ->
-    NewState=State#state{local_services=lists:usort([{ServiceId,node()}|State#state.local_services])},
-    sd_service:trade_services(),
-    {noreply,NewState};
-
-handle_cast({remove_service, ServiceId}, State) ->
-    NewState=State#state{local_services=lists:delete({ServiceId,node()},State#state.local_services)},
-    sd_service:trade_services(),
-    {noreply,NewState};
 
 handle_cast({trade_services}, State) ->
     LocalServicesList = State#state.local_services,
