@@ -52,6 +52,7 @@ cases_test()->
 %% Returns: non
 %% --------------------------------------------------------------------
 setup()->
+    rpc:call('node1@asus',application,stop,[sd_service]),
     ?assertEqual(ok,rpc:call('node1@asus',application,start,[sd_service])),
     %timer:sleep(200),	
     

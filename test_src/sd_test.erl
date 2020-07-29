@@ -54,7 +54,10 @@ add_1()->
 		  {"s1",sd_test@asus}],
 		 rpc:call(node(),sd_service,fetch_all,[all])),
 
-    ?assertMatch([{"s1",node1@asus}],
+ 
+   rpc:cast(?VM1,sd_service,remove_service,["s1"]),
+    
+   ?assertMatch([],
 		 rpc:call(?VM1,sd_service,fetch_all,[local_services])),
     ?assertMatch([{"s1",node1@asus},
 		  {"s1",sd_test@asus}],rpc:call(?VM1,sd_service,fetch_all,[all])),

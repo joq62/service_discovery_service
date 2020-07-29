@@ -156,10 +156,12 @@ handle_cast({heart_beat,Interval}, State) ->
 
 handle_cast({add_service, ServiceId}, State) ->
     NewState=State#state{local_services=lists:usort([{ServiceId,node()}|State#state.local_services])},
+    sd_service:trade_services(),
     {noreply,NewState};
 
 handle_cast({remove_service, ServiceId}, State) ->
     NewState=State#state{local_services=lists:delete({ServiceId,node()},State#state.local_services)},
+    sd_service:trade_services(),
     {noreply,NewState};
 
 handle_cast({trade_services}, State) ->
